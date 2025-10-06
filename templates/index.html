@@ -1,32 +1,93 @@
 {% extends 'base.html' %} {% block content %}
 <section class="card">
-    <h2>Cargar archivo XML</h2>
+    <h2>📁 Cargar Configuración XML</h2>
     <form action="/upload" method="post" enctype="multipart/form-data">
         <input type="file" name="file" accept=".xml" required>
-        <button type="submit">Cargar</button>
+        <button type="submit">Cargar Archivo</button>
     </form>
+
+    {% if mensaje %}
+    <div style="color: green; margin-top: 1rem;">✓ {{ mensaje }}</div>
+    {% endif %} {% if error %}
+    <div style="color: red; margin-top: 1rem;">✗ {{ error }}</div>
+    {% endif %}
 </section>
 
-{% if data %}
+{% if invernaderos %}
 <section class="card">
-    <h3>Invernaderos disponibles</h3>
+    <h3>🌱 Simular Plan de Riego</h3>
     <form action="/simulate" method="post">
-        <label for="invernadero">Invernadero:</label>
-        <select name="invernadero">
-            {% for inv in data.iter() %}
+        <div style="margin-bottom: 1rem;">
+            <label for="invernadero"><strong>Seleccionar Invernadero:</strong></label>
+            <select name="invernadero" id="invernadero" required onchange="actualizarPlanes()" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                <option value="">-- Selecciona un invernadero --</option>
+                {% for inv in invernaderos.iter() %}
                 <option value="{{ inv.nombre }}">{{ inv.nombre }}</option>
-            {% endfor %}
-        </select>
-
-        <label for="plan">Plan:</label>
-        <select name="plan">
-            {% for inv in data.iter() %}
-                {% for p in inv.planes.iter() %}
-                    <option value="{{ p[0] }}">{{ inv.nombre }} - {{ p[0] }}</option>
                 {% endfor %}
-            {% endfor %}
-        </select>
-        <button type="submit">Simular</button>
+            </select>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <label for="plan"><strong>Seleccionar Plan de Riego:</strong></label>
+            <select name="plan" id="plan" required style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+                <option value="">-- Primero selecciona un invernadero --</option>
+            </select>
+        </div>
+
+        <button type="submit">▶ Simular</button>
     </form>
 </section>
-{% endif %} {% endblock %}
+
+<section class="card">
+    <h3>📊 Invernaderos Cargados</h3>
+    {% for inv in invernaderos.iter() %}
+    <div style="border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
+        <h4>{{ inv.nombre }}</h4>
+        <p><strong>Hileras:</strong> {{ inv.numero_hileras }} | <strong>Plantas por hilera:</strong> {{ inv.plantas_por_hilera }}</p>
+        <p><strong>Planes disponibles:</strong></p>
+        <ul>
+            {% for plan_nombre, secuencia in inv.planes.iter() %}
+            <li>{{ plan_nombre }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+</section>
+
+<script>
+    const invernaderos = {}; { %
+        for inv in invernaderos.iter() %
+    }
+    invernaderos["{{ inv.nombre }}"] = []; { %
+        for plan_nombre, secuencia in inv.planes.iter() %
+    }
+    invernaderos["{{ inv.nombre }}"].push("{{ plan_nombre }}"); { % endfor %
+    } { % endfor %
+    }
+
+    function actualizarPlanes() {
+        const invSelect = document.getElementById('invernadero');
+        const planSelect = document.getElementById('plan');
+        const invNombre = invSelect.value;
+
+        planSelect.innerHTML = '<option value="">-- Selecciona un plan --</option>';
+
+        if (invNombre && invernaderos[invNombre]) {
+            invernaderos[invNombre].forEach(function(plan) {
+                const option = document.createElement('option');
+                option.value = plan;
+                option.textContent = plan;
+                planSelect.appendChild(option);
+            });
+        }
+    }
+</script>
+{% endif %}
+
+<section class="card" style="text-align: center;">
+    <a href="/ayuda">
+        <button>❓ Ayuda</button>
+    </a>
+</section>
+
+{% endblock %}

@@ -1,18 +1,102 @@
 {% extends 'base.html' %} {% block content %}
 <section class="card">
-    <h2>Reporte: {{ results.invernadero.nombre }}</h2>
-    <p>Tiempo total: {{ results.tiempo_optimo }} segundos</p>
-    <h3>Acciones</h3>
-    <ul>
-        {% for s, acciones in results.acciones_lista %}
-        <li><strong>{{ s }}s:</strong>
-            <ul>
-                {% for dron, acc in acciones %}
-                <li>{{ dron }} → {{ acc }}</li>
+    <h2>📊 Reporte de Simulación</h2>
+    <h3>{{ results.invernadero.nombre }} - {{ results.plan_nombre }}</h3>
+
+    <!-- Estadísticas Generales -->
+    <div style="background: #f0f8ff; padding: 1rem; border-radius: 4px; margin: 1rem 0;">
+        <h4>⏱️ Tiempo Óptimo de Riego: {{ results.tiempo_optimo }} segundos</h4>
+    </div>
+
+    <!-- Tabla de Asignación de Drones -->
+    <h4>🚁 Asignación de Drones a Hileras</h4>
+    <table border="1" style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+        <thead style="background: #0077ff; color: white;">
+            <tr>
+                <th style="padding: 0.5rem;">Hilera</th>
+                <th style="padding: 0.5rem;">Dron</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dron in results.invernadero.drones.iter() %}
+            <tr>
+                <td style="padding: 0.5rem; text-align: center;">H{{ dron.hilera }}</td>
+                <td style="padding: 0.5rem; text-align: center;">{{ dron.nombre }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Tabla de Instrucciones por Segundo -->
+    <h4>📋 Instrucciones Enviadas a cada Dron</h4>
+    <table border="1" style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+        <thead style="background: #0077ff; color: white;">
+            <tr>
+                <th style="padding: 0.5rem;">Tiempo</th>
+                {% for dron in results.invernadero.drones.iter() %}
+                <th style="padding: 0.5rem;">{{ dron.nombre }}</th>
                 {% endfor %}
-            </ul>
-        </li>
-        {% endfor %}
-    </ul>
+            </tr>
+        </thead>
+        <tbody>
+            {% for segundo, acciones in results.acciones_lista %}
+            <tr>
+                <td style="padding: 0.5rem; text-align: center; font-weight: bold;">{{ segundo }} seg</td>
+                {% for dron in results.invernadero.drones.iter() %}
+                <td style="padding: 0.5rem;">
+                    {% set accion_encontrada = [] %} {% for nombre_dron, accion in acciones %} {% if nombre_dron == dron.nombre %} {% set _ = accion_encontrada.append(accion) %} {% endif %} {% endfor %} {{ accion_encontrada[0] if accion_encontrada else '-' }}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Estadísticas de Agua y Fertilizante -->
+    <h4>💧 Uso de Agua y Fertilizante por Dron</h4>
+    <table border="1" style="width: 100%; border-collapse: collapse; margin: 1rem 0;">
+        <thead style="background: #0077ff; color: white;">
+            <tr>
+                <th style="padding: 0.5rem;">Dron</th>
+                <th style="padding: 0.5rem;">Litros de Agua</th>
+                <th style="padding: 0.5rem;">Gramos de Fertilizante</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set total_agua = 0 %} {% set total_fertilizante = 0 %} {% for dron in results.invernadero.drones.iter() %}
+            <tr>
+                <td style="padding: 0.5rem; text-align: center;">{{ dron.nombre }}</td>
+                <td style="padding: 0.5rem; text-align: center;">{{ dron.litros_total }}</td>
+                <td style="padding: 0.5rem; text-align: center;">{{ dron.gramos_total }}</td>
+            </tr>
+            {% set total_agua = total_agua + dron.litros_total %} {% set total_fertilizante = total_fertilizante + dron.gramos_total %} {% endfor %}
+            <tr style="background: #e8f4f8; font-weight: bold;">
+                <td style="padding: 0.5rem; text-align: center;">TOTAL</td>
+                <td style="padding: 0.5rem; text-align: center;">{{ total_agua }}</td>
+                <td style="padding: 0.5rem; text-align: center;">{{ total_fertilizante }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Botones de Acción -->
+    <div style="margin-top: 2rem;">
+        <form action="/generar_salida" method="post" style="display: inline;">
+            <input type="hidden" name="invernadero" value="{{ results.invernadero.nombre }}">
+            <input type="hidden" name="plan" value="{{ results.plan_nombre }}">
+            <button type="submit">💾 Generar XML de Salida</button>
+        </form>
+
+        <form action="/generar_grafo" method="post" style="display: inline; margin-left: 1rem;">
+            <input type="hidden" name="invernadero" value="{{ results.invernadero.nombre }}">
+            <input type="hidden" name="plan" value="{{ results.plan_nombre }}">
+            <label>Tiempo (segundos):</label>
+            <input type="number" name="tiempo_t" min="1" max="{{ results.tiempo_optimo }}" value="{{ results.tiempo_optimo }}" style="width: 80px; padding: 0.3rem;">
+            <button type="submit">📊 Ver Grafo TDA</button>
+        </form>
+
+        <a href="/" style="margin-left: 1rem;">
+            <button type="button">🏠 Volver al Inicio</button>
+        </a>
+    </div>
 </section>
 {% endblock %}
