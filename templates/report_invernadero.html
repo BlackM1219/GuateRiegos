@@ -1,0 +1,18 @@
+{% extends 'base.html' %} {% block content %}
+<section class="card">
+    <h2>Reporte: {{ results.invernadero.nombre }}</h2>
+    <p>Tiempo total: {{ results.tiempo_optimo }} segundos</p>
+    <h3>Acciones</h3>
+    <ul>
+        {% for s, acciones in results.acciones_lista %}
+        <li><strong>{{ s }}s:</strong>
+            <ul>
+                {% for dron, acc in acciones %}
+                <li>{{ dron }} → {{ acc }}</li>
+                {% endfor %}
+            </ul>
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}
