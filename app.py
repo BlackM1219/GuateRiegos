@@ -193,15 +193,22 @@ def create_app():
                 outpath=os.path.join("static", "tda_graph"),
             )
 
-            return render_template(
-                "graph_view.html", image_path="tda_graph.png", tiempo=tiempo_t
-            )
+            if img_path:
+                print(f"✓ Grafo generado: {img_path}")
+                return render_template(
+                    "graph_view.html",
+                    image_path="tda_graph.png",
+                    tiempo=tiempo_t,
+                    results=datos["ultimo_resultado"],
+                )
+            else:
+                return "<h3>Error: Graphviz no está instalado</h3><p>Instala Graphviz: <a href='https://graphviz.org/download/'>https://graphviz.org/download/</a></p><a href='/'>Volver</a>"
         except Exception as e:
             print(f"✗ Error al generar grafo: {str(e)}")
             import traceback
 
             traceback.print_exc()
-            return f"Error al generar grafo: {str(e)}"
+            return f"<h3>Error al generar grafo</h3><p>{str(e)}</p><p>Asegúrate de tener Graphviz instalado</p><a href='/'>Volver</a>"
 
     @app.route("/ayuda")
     def ayuda():

@@ -2,67 +2,65 @@
 digraph {
 	rankdir=TB size="10,8"
 	node [fillcolor=lightblue shape=box style="rounded,filled"]
-	plan [label="Plan: Semana 1" fillcolor=gold fontname="Arial Bold" fontsize=14]
-	seq_0 [label="H1-P1" fillcolor=lightyellow]
+	plan [label="Plan: Semana 2" fillcolor=gold fontname="Arial Bold" fontsize=14]
+	seq_0 [label="H2-P1" fillcolor=lightyellow]
 	plan -> seq_0
-	seq_1 [label="H4-P1" fillcolor=lightyellow]
+	seq_1 [label="H1-P2" fillcolor=lightyellow]
 	seq_0 -> seq_1
-	seq_2 [label="H2-P2" fillcolor=lightyellow]
+	seq_2 [label="H3-P1" fillcolor=lightyellow]
 	seq_1 -> seq_2
-	seq_3 [label="H3-P2" fillcolor=lightyellow]
+	seq_3 [label="H4-P2" fillcolor=lightyellow]
 	seq_2 -> seq_3
-	seq_4 [label="H1-P3" fillcolor=lightyellow]
+	seq_4 [label="H2-P3" fillcolor=lightyellow]
 	seq_3 -> seq_4
-	seq_5 [label="H4-P3" fillcolor=lightyellow]
+	seq_5 [label="H3-P3" fillcolor=lightyellow]
 	seq_4 -> seq_5
 	acciones_title [label="Acciones por Tiempo" fillcolor=lightgreen fontname="Arial Bold" fontsize=12]
 	tiempo_1 [label="Segundo 1" fillcolor=orange shape=ellipse]
 	acciones_title -> tiempo_1
-	t1_a0 [label="DR01\nRegar" fillcolor=white fontsize=10 shape=note]
+	t1_a0 [label="DR02\nRegar" fillcolor=white fontsize=10 shape=note]
 	tiempo_1 -> t1_a0
-	t1_a1 [label="DR04\nEsperar" fillcolor=white fontsize=10 shape=note]
+	t1_a1 [label="DR01\nAdelante (H1P2)" fillcolor=white fontsize=10 shape=note]
 	tiempo_1 -> t1_a1
-	t1_a2 [label="DR02\nAdelante (H2P2)" fillcolor=white fontsize=10 shape=note]
+	t1_a2 [label="DR03\nEsperar" fillcolor=white fontsize=10 shape=note]
 	tiempo_1 -> t1_a2
-	t1_a3 [label="DR03\nAdelante (H3P2)" fillcolor=white fontsize=10 shape=note]
+	t1_a3 [label="DR04\nAdelante (H4P2)" fillcolor=white fontsize=10 shape=note]
 	tiempo_1 -> t1_a3
 	tiempo_2 [label="Segundo 2" fillcolor=orange shape=ellipse]
 	acciones_title -> tiempo_2
-	t2_a0 [label="DR04\nRegar" fillcolor=white fontsize=10 shape=note]
+	t2_a0 [label="DR01\nRegar" fillcolor=white fontsize=10 shape=note]
 	tiempo_2 -> t2_a0
-	t2_a1 [label="DR02\nEsperar" fillcolor=white fontsize=10 shape=note]
+	t2_a1 [label="DR03\nEsperar" fillcolor=white fontsize=10 shape=note]
 	tiempo_2 -> t2_a1
-	t2_a2 [label="DR03\nEsperar" fillcolor=white fontsize=10 shape=note]
+	t2_a2 [label="DR04\nEsperar" fillcolor=white fontsize=10 shape=note]
 	tiempo_2 -> t2_a2
-	t2_a3 [label="DR01\nAdelante (H1P2)" fillcolor=white fontsize=10 shape=note]
+	t2_a3 [label="DR02\nAdelante (H2P2)" fillcolor=white fontsize=10 shape=note]
 	tiempo_2 -> t2_a3
 	tiempo_3 [label="Segundo 3" fillcolor=orange shape=ellipse]
 	acciones_title -> tiempo_3
-	t3_a0 [label="DR02\nRegar" fillcolor=white fontsize=10 shape=note]
+	t3_a0 [label="DR03\nRegar" fillcolor=white fontsize=10 shape=note]
 	tiempo_3 -> t3_a0
-	t3_a1 [label="DR03\nEsperar" fillcolor=white fontsize=10 shape=note]
+	t3_a1 [label="DR04\nEsperar" fillcolor=white fontsize=10 shape=note]
 	tiempo_3 -> t3_a1
-	t3_a2 [label="DR01\nAdelante (H1P3)" fillcolor=white fontsize=10 shape=note]
+	t3_a2 [label="DR02\nAdelante (H2P3)" fillcolor=white fontsize=10 shape=note]
 	tiempo_3 -> t3_a2
-	t3_a3 [label="DR04\nAdelante (H4P2)" fillcolor=white fontsize=10 shape=note]
-	tiempo_3 -> t3_a3
 	tiempo_4 [label="Segundo 4" fillcolor=orange shape=ellipse]
 	acciones_title -> tiempo_4
-	t4_a0 [label="DR03\nRegar" fillcolor=white fontsize=10 shape=note]
+	t4_a0 [label="DR04\nRegar" fillcolor=white fontsize=10 shape=note]
 	tiempo_4 -> t4_a0
-	t4_a1 [label="DR01\nEsperar" fillcolor=white fontsize=10 shape=note]
+	t4_a1 [label="DR02\nEsperar" fillcolor=white fontsize=10 shape=note]
 	tiempo_4 -> t4_a1
-	t4_a2 [label="DR04\nAdelante (H4P3)" fillcolor=white fontsize=10 shape=note]
+	t4_a2 [label="DR03\nAdelante (H3P2)" fillcolor=white fontsize=10 shape=note]
 	tiempo_4 -> t4_a2
 	tiempo_5 [label="Segundo 5" fillcolor=orange shape=ellipse]
 	acciones_title -> tiempo_5
-	t5_a0 [label="DR01\nRegar" fillcolor=white fontsize=10 shape=note]
+	t5_a0 [label="DR02\nRegar" fillcolor=white fontsize=10 shape=note]
 	tiempo_5 -> t5_a0
-	t5_a1 [label="DR04\nEsperar" fillcolor=white fontsize=10 shape=note]
+	t5_a1 [label="DR03\nAdelante (H3P3)" fillcolor=white fontsize=10 shape=note]
 	tiempo_5 -> t5_a1
 	tiempo_6 [label="Segundo 6" fillcolor=orange shape=ellipse]
 	acciones_title -> tiempo_6
-	t6_a0 [label="DR04\nRegar" fillcolor=white fontsize=10 shape=note]
+	t6_a0 [label="DR03\nRegar" fillcolor=white fontsize=10 shape=note]
 	tiempo_6 -> t6_a0
 	time_info [label="Visualizando hasta t=7s" fillcolor=pink shape=note]
 }
