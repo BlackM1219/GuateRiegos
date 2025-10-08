@@ -1,45 +1,106 @@
-# Genera un archivo DOT que representa el estado de los TDAs (plan y cola de acciones) en un tiempo t
-
 from graphviz import Digraph
 
+
 class GraphvizGenerator:
-    def generate_tda_graph(self, result, time_t=None, outpath='tda.dot'):
-        dot = Digraph(comment='TDA State')
-        # Nodo plan secuencial
-        dot.node('plan', f'Plan: {result.plan_nombre}')
+    """Generador de gráficos Graphviz para visualizar TDAs"""
 
-        # agregar secuencia completa
-        seq_nodes = []
-        # result.invernadero.planes: ListaSimple de (nombre, seq)
-        for p in result.invernadero.planes.iter():
-            if p[0] == result.plan_nombre:
-                seq = p[1]
-                break
-        else:
-            seq = []
+    def generate_tda_graph(self, result, time_t=None, outpath="static/tda_graph"):
+        """
+        Genera un grafo mostrando el estado de los TDAs en un tiempo t
+        - Plan de riego (secuencia)
+        - Acciones ejecutadas hasta el tiempo t
+        """
+        dot = Digraph(comment="Estado de TDAs", format="png")
+        dot.attr(rankdir="TB", size="10,8")
+        dot.attr("node", shape="box", style="rounded,filled", fillcolor="lightblue")
 
-        for i, item in enumerate(seq):
-            nid = f's{i}'
-            dot.node(nid, item)
-            seq_nodes.append(nid)
-        for i in range(len(seq_nodes)-1):
-            dot.edge(seq_nodes[i], seq_nodes[i+1])
-        if seq_nodes:
-            dot.edge('plan', seq_nodes[0])
+        # Nodo principal del plan
+        dot.node(
+            "plan",
+            f'Plan: {result["plan_nombre"]}',
+            fillcolor="gold",
+            fontsize="14",
+            fontname="Arial Bold",
+        )
 
-        # acciones en tiempos: mostrar hasta time_t if provided
+        # Obtener secuencia del plan
+        secuencia_plan = result["invernadero"].buscar_plan(result["plan_nombre"])
+
+        if secuencia_plan:
+            # Crear nodos para cada elemento de la secuencia
+            prev_node = "plan"
+            idx = 0
+            for item in secuencia_plan.iter():
+                node_id = f"seq_{idx}"
+                dot.node(node_id, item, fillcolor="lightyellow")
+                dot.edge(prev_node, node_id)
+                prev_node = node_id
+                idx += 1
+                # Limitar a 15 nodos para no saturar
+                if idx >= 15:
+                    dot.node("seq_more", "...más elementos", fillcolor="lightgray")
+                    dot.edge(prev_node, "seq_more")
+                    break
+
+        # Filtrar acciones hasta tiempo t (si se especifica)
+        acciones_mostrar = result["acciones_lista"]
         if time_t is not None:
-            acciones = [a for a in result.acciones_lista if a[0] <= time_t]
-        else:
-            acciones = result.acciones_lista
+            acciones_mostrar = [
+                (s, acc) for s, acc in result["acciones_lista"] if s <= time_t
+            ]
 
-        for segundo, acciones_seg in acciones:
-            node_id = f't{segundo}'
-            dot.node(node_id, f'T={segundo}s')
-            for dr_name, accion in acciones_seg:
-                act_id = f'{node_id}_{dr_name}_{accion}'
-                dot.node(act_id, f'{dr_name}: {accion}')
-                dot.edge(node_id, act_id)
+        # Crear subgrafo para acciones por tiempo
+        if acciones_mostrar:
+            dot.node(
+                "acciones_title",
+                "Acciones por Tiempo",
+                fillcolor="lightgreen",
+                fontsize="12",
+                fontname="Arial Bold",
+            )
 
-        dot.save(outpath)
-        return outpath
+            # Limitar a los primeros 10 segundos para no saturar el grafo
+            for segundo, acciones in acciones_mostrar[:10]:
+                tiempo_id = f"tiempo_{segundo}"
+                dot.node(
+                    tiempo_id, f"Segundo {segundo}", fillcolor="orange", shape="ellipse"
+                )
+                dot.edge("acciones_title", tiempo_id)
+
+                # Agregar acciones de cada dron en ese segundo
+                for idx, (dron_nombre, accion) in enumerate(acciones):
+                    accion_id = f"t{segundo}_a{idx}"
+                    label = f"{dron_nombre}\\n{accion}"
+                    dot.node(
+                        accion_id, label, fillcolor="white", shape="note", fontsize="10"
+                    )
+                    dot.edge(tiempo_id, accion_id)
+
+            # Si hay más acciones, indicarlo
+            if len(acciones_mostrar) > 10:
+                dot.node(
+                    "more_actions",
+                    f"... {len(acciones_mostrar) - 10} segundos más",
+                    fillcolor="lightgray",
+                    shape="plaintext",
+                )
+                dot.edge("acciones_title", "more_actions")
+
+        # Información del tiempo
+        if time_t:
+            dot.node(
+                "time_info",
+                f"Visualizando hasta t={time_t}s",
+                fillcolor="pink",
+                shape="note",
+            )
+
+        # Guardar archivo
+        try:
+            dot.render(outpath, cleanup=True)
+            return f"{outpath}.png"
+        except Exception as e:
+            print(f"Error al generar grafo: {e}")
+            # Intentar guardar solo el DOT sin renderizar
+            dot.save(f"{outpath}.dot")
+            return None

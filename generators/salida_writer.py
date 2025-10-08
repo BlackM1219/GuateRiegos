@@ -1,38 +1,75 @@
 import xml.etree.ElementTree as ET
+from xml.dom import minidom
+
 
 class SalidaWriter:
-    def write(self, result, outpath):
-        # result: objeto con invernadero, plan_nombre, tiempo_optimo, eficiencia_por_dron (ListaSimple), acciones_lista
-        root = ET.Element('datosSalida')
-        listaInv = ET.SubElement(root, 'listaInvernaderos')
-        inv_el = ET.SubElement(listaInv, 'invernadero', {'nombre': result.invernadero.nombre})
-        listaPlanes = ET.SubElement(inv_el, 'listaPlanes')
-        plan_el = ET.SubElement(listaPlanes, 'plan', {'nombre': result.plan_nombre})
-        ET.SubElement(plan_el, 'tiempoOptimoSegundos').text = str(result.tiempo_optimo)
+    """Escritor de archivos XML de salida"""
 
-        # agua y fertilizante totales
-        total_agua = 0.0
-        total_gramos = 0.0
-        eficiencia_el = ET.SubElement(plan_el, 'eficienciaDronesRegadores')
+    def write(self, result, outpath="salida.xml"):
+        """
+        Genera el archivo XML de salida con los resultados de la simulación
+        según el formato especificado en el documento
+        """
+        # Crear estructura XML
+        root = ET.Element("datosSalida")
+        lista_inv = ET.SubElement(root, "listaInvernaderos")
 
-        for d in result.invernadero.drones.iter():
-            ET.SubElement(eficiencia_el, 'dron', {
-                'nombre': d.nombre,
-                'litrosAgua': str(d.litros_total),
-                'gramosFertilizante': str(d.gramos_total)
-            })
-            total_agua += d.litros_total
-            total_gramos += d.gramos_total
+        # Datos del invernadero
+        inv_elem = ET.SubElement(
+            lista_inv, "invernadero", {"nombre": result["invernadero"].nombre}
+        )
+        lista_planes = ET.SubElement(inv_elem, "listaPlanes")
 
-        ET.SubElement(plan_el, 'aguaRequeridaLitros').text = str(total_agua)
-        ET.SubElement(plan_el, 'fertilizanteRequeridoGramos').text = str(total_gramos)
+        # Datos del plan
+        plan_elem = ET.SubElement(
+            lista_planes, "plan", {"nombre": result["plan_nombre"]}
+        )
 
-        instr_el = ET.SubElement(plan_el, 'instrucciones')
-        for segundo, acciones in result.acciones_lista:
-            tiempo_el = ET.SubElement(instr_el, 'tiempo', {'segundos': str(segundo)})
-            for dr_name, accion in acciones:
-                ET.SubElement(tiempo_el, 'dron', {'nombre': dr_name, 'accion': accion})
+        # Tiempo óptimo
+        tiempo_elem = ET.SubElement(plan_elem, "tiempoOptimoSegundos")
+        tiempo_elem.text = str(result["tiempo_optimo"])
 
-        tree = ET.ElementTree(root)
-        tree.write(outpath, encoding='utf-8', xml_declaration=True)
+        # Calcular totales de agua y fertilizante
+        total_agua = 0
+        total_fertilizante = 0
+
+        # Eficiencia de drones
+        eficiencia_elem = ET.SubElement(plan_elem, "eficienciaDronesRegadores")
+        for dron in result["invernadero"].drones.iter():
+            ET.SubElement(
+                eficiencia_elem,
+                "dron",
+                {
+                    "nombre": dron.nombre,
+                    "litrosAgua": str(dron.litros_total),
+                    "gramosFertilizante": str(dron.gramos_total),
+                },
+            )
+            total_agua += dron.litros_total
+            total_fertilizante += dron.gramos_total
+
+        # Totales
+        agua_elem = ET.SubElement(plan_elem, "aguaRequeridaLitros")
+        agua_elem.text = str(total_agua)
+
+        fertilizante_elem = ET.SubElement(plan_elem, "fertilizanteRequeridoGramos")
+        fertilizante_elem.text = str(total_fertilizante)
+
+        # Instrucciones detalladas
+        instrucciones_elem = ET.SubElement(plan_elem, "instrucciones")
+        for segundo, acciones in result["acciones_lista"]:
+            tiempo_elem = ET.SubElement(
+                instrucciones_elem, "tiempo", {"segundos": str(segundo)}
+            )
+            for dron_nombre, accion in acciones:
+                ET.SubElement(
+                    tiempo_elem, "dron", {"nombre": dron_nombre, "accion": accion}
+                )
+
+        # Formatear y guardar XML
+        xml_str = minidom.parseString(ET.tostring(root)).toprettyxml(indent="  ")
+
+        with open(outpath, "w", encoding="utf-8") as f:
+            f.write(xml_str)
+
         return outpath

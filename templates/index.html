@@ -19,7 +19,8 @@
     <form action="/simulate" method="post">
         <div style="margin-bottom: 1rem;">
             <label for="invernadero"><strong>Seleccionar Invernadero:</strong></label>
-            <select name="invernadero" id="invernadero" required onchange="actualizarPlanes()" style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
+            <select name="invernadero" id="invernadero" required onchange="actualizarPlanes()"
+                style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
                 <option value="">-- Selecciona un invernadero --</option>
                 {% for inv in invernaderos.iter() %}
                 <option value="{{ inv.nombre }}">{{ inv.nombre }}</option>
@@ -31,6 +32,12 @@
             <label for="plan"><strong>Seleccionar Plan de Riego:</strong></label>
             <select name="plan" id="plan" required style="width: 100%; padding: 0.5rem; margin-top: 0.5rem;">
                 <option value="">-- Primero selecciona un invernadero --</option>
+                {% for inv in invernaderos.iter() %}
+                {% for plan_nombre, secuencia in inv.planes.iter() %}
+                <option value="{{ plan_nombre }}" data-invernadero="{{ inv.nombre }}" style="display:none;">{{
+                    plan_nombre }}</option>
+                {% endfor %}
+                {% endfor %}
             </select>
         </div>
 
@@ -43,7 +50,8 @@
     {% for inv in invernaderos.iter() %}
     <div style="border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
         <h4>{{ inv.nombre }}</h4>
-        <p><strong>Hileras:</strong> {{ inv.numero_hileras }} | <strong>Plantas por hilera:</strong> {{ inv.plantas_por_hilera }}</p>
+        <p><strong>Hileras:</strong> {{ inv.numero_hileras }} | <strong>Plantas por hilera:</strong> {{
+            inv.plantas_por_hilera }}</p>
         <p><strong>Planes disponibles:</strong></p>
         <ul>
             {% for plan_nombre, secuencia in inv.planes.iter() %}
@@ -55,30 +63,24 @@
 </section>
 
 <script>
-    const invernaderos = {}; { %
-        for inv in invernaderos.iter() %
-    }
-    invernaderos["{{ inv.nombre }}"] = []; { %
-        for plan_nombre, secuencia in inv.planes.iter() %
-    }
-    invernaderos["{{ inv.nombre }}"].push("{{ plan_nombre }}"); { % endfor %
-    } { % endfor %
-    }
-
     function actualizarPlanes() {
-        const invSelect = document.getElementById('invernadero');
-        const planSelect = document.getElementById('plan');
-        const invNombre = invSelect.value;
+        var invSelect = document.getElementById('invernadero');
+        var planSelect = document.getElementById('plan');
+        var invNombre = invSelect.value;
 
-        planSelect.innerHTML = '<option value="">-- Selecciona un plan --</option>';
-
-        if (invNombre && invernaderos[invNombre]) {
-            invernaderos[invNombre].forEach(function(plan) {
-                const option = document.createElement('option');
-                option.value = plan;
-                option.textContent = plan;
-                planSelect.appendChild(option);
-            });
+        var allOptions = planSelect.getElementsByTagName('option');
+        for (var i = 0; i < allOptions.length; i++) {
+            if (i === 0) {
+                allOptions[i].style.display = 'block';
+                allOptions[i].selected = true;
+            } else {
+                var optionInv = allOptions[i].getAttribute('data-invernadero');
+                if (optionInv === invNombre) {
+                    allOptions[i].style.display = 'block';
+                } else {
+                    allOptions[i].style.display = 'none';
+                }
+            }
         }
     }
 </script>

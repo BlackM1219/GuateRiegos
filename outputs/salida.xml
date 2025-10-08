@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<datosSalida>
+  <listaInvernaderos>
+    <invernadero nombre="Invernadero Santa Rosa">
+      <listaPlanes>
+        <plan nombre="Semana 1">
+          <tiempoOptimoSegundos>7</tiempoOptimoSegundos>
+          <eficienciaDronesRegadores>
+            <dron nombre="DR01" litrosAgua="6" gramosFertilizante="600"/>
+            <dron nombre="DR02" litrosAgua="1" gramosFertilizante="50"/>
+            <dron nombre="DR03" litrosAgua="1" gramosFertilizante="100"/>
+            <dron nombre="DR04" litrosAgua="6" gramosFertilizante="600"/>
+          </eficienciaDronesRegadores>
+          <aguaRequeridaLitros>14</aguaRequeridaLitros>
+          <fertilizanteRequeridoGramos>1350</fertilizanteRequeridoGramos>
+          <instrucciones>
+            <tiempo segundos="1">
+              <dron nombre="DR01" accion="Regar"/>
+              <dron nombre="DR04" accion="Esperar"/>
+              <dron nombre="DR02" accion="Adelante (H2P2)"/>
+              <dron nombre="DR03" accion="Adelante (H3P2)"/>
+            </tiempo>
+            <tiempo segundos="2">
+              <dron nombre="DR04" accion="Regar"/>
+              <dron nombre="DR02" accion="Esperar"/>
+              <dron nombre="DR03" accion="Esperar"/>
+              <dron nombre="DR01" accion="Adelante (H1P2)"/>
+            </tiempo>
+            <tiempo segundos="3">
+              <dron nombre="DR02" accion="Regar"/>
+              <dron nombre="DR03" accion="Esperar"/>
+              <dron nombre="DR01" accion="Adelante (H1P3)"/>
+              <dron nombre="DR04" accion="Adelante (H4P2)"/>
+            </tiempo>
+            <tiempo segundos="4">
+              <dron nombre="DR03" accion="Regar"/>
+              <dron nombre="DR01" accion="Esperar"/>
+              <dron nombre="DR04" accion="Adelante (H4P3)"/>
+            </tiempo>
+            <tiempo segundos="5">
+              <dron nombre="DR01" accion="Regar"/>
+              <dron nombre="DR04" accion="Esperar"/>
+            </tiempo>
+            <tiempo segundos="6">
+              <dron nombre="DR04" accion="Regar"/>
+            </tiempo>
+          </instrucciones>
+        </plan>
+      </listaPlanes>
+    </invernadero>
+  </listaInvernaderos>
+</datosSalida>
